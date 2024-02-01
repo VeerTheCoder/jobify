@@ -1,19 +1,17 @@
-import { Outlet, redirect, useLoaderData, useNavigate } from 'react-router-dom';
-import customFetch from '../utils/customFetch';
+import { Outlet, redirect, useLoaderData, useNavigate } from "react-router-dom";
+import customFetch from "../utils/customFetch";
 import Wrapper from "../assets/wrappers/Dashboard";
-import { Navbar, BigSidebar, SmallSidebar } from "../components";
+import { Navbar, BigSidebar, SmallSidebar, Loading } from "../components";
 import { useState, createContext, useContext } from "react";
 import { checkDefaultTheme } from "../App";
-import { toast } from 'react-toastify';
-
-
+import { toast } from "react-toastify";
 
 export const loader = async () => {
   try {
-    const { data } = await customFetch('/users/current-user');
+    const { data } = await customFetch("/users/current-user");
     return data;
   } catch (error) {
-    return redirect('/');
+    return redirect("/");
   }
 };
 
@@ -21,6 +19,7 @@ const DashboardContext = createContext();
 const DashboardLayout = () => {
   const { user } = useLoaderData();
   const navigate = useNavigate();
+  const isPageLoading = navigation.state === 'loading';
 
   const [showSidebar, setShowSidebar] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(checkDefaultTheme);
@@ -37,9 +36,9 @@ const DashboardLayout = () => {
   };
 
   const logoutUser = async () => {
-    navigate('/');
-    await customFetch.get('/auth/logout');
-    toast.success('Logging out...');
+    navigate("/");
+    await customFetch.get("/auth/logout");
+    toast.success("Logging out...");
   };
   return (
     <DashboardContext.Provider
@@ -58,7 +57,7 @@ const DashboardLayout = () => {
           <div>
             <Navbar />
             <div className="dashboard-page">
-              <Outlet  context={{user}}/>
+              {isPageLoading ? <Loading /> : <Outlet context={{ user }} />}
             </div>
           </div>
         </main>
